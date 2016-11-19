@@ -1,12 +1,13 @@
-
 package org.usfirst.frc.team360.robot;
 
-import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.internal.HardwareTimer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import org.usfirst.frc.team360.robot.commands.ExampleCommand;
-import org.usfirst.frc.team360.robot.subsystems.ExampleSubsystem;
+import org.usfirst.frc.team360.robot.commands.*;
+import org.usfirst.frc.team360.robot.subsystems.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -19,9 +20,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends IterativeRobot {
 
-	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
+	public static Logger logger;
+	
 	public static OI oi;
 
+	public static HardwareTimer RoboRioTimer;
+	
+	Command usbsave1;
     Command autonomousCommand;
     SendableChooser chooser;
 
@@ -30,9 +35,11 @@ public class Robot extends IterativeRobot {
      * used for any initialization code.
      */
     public void robotInit() {
+    	logger = new Logger();
+    	RoboRioTimer = new HardwareTimer();
 		oi = new OI();
+		usbsave1 = new UsbSave2();
         chooser = new SendableChooser();
-        chooser.addDefault("Default Auto", new ExampleCommand());
 //        chooser.addObject("My Auto", new MyAutoCommand());
         SmartDashboard.putData("Auto mode", chooser);
     }
@@ -43,7 +50,7 @@ public class Robot extends IterativeRobot {
 	 * the robot is disabled.
      */
     public void disabledInit(){
-
+    	logger.closeLogger();
     }
 	
 	public void disabledPeriodic() {
@@ -89,7 +96,8 @@ public class Robot extends IterativeRobot {
         // teleop starts running. If you want the autonomous to 
         // continue until interrupted by another command, remove
         // this line or comment it out.
-        if (autonomousCommand != null) autonomousCommand.cancel();
+    	logger.initLogger();
+        usbsave1.start();
     }
 
     /**
